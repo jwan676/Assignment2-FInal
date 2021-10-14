@@ -1,0 +1,141 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "./data/nobel_final.csv"},
+  "config": {"style": {"cell":{"stroke":"transparent"}}},
+  "padding":40,
+
+"params": [  {  "name": "Year", 
+  "value": 2019,  
+  "bind": {  "input": "range", 
+             "min": 1901,  "max": 2019,  "step": 1,  
+             "name": "Year: " }  }, 
+             {  "name": "Subject_selection",  
+             "bind": {  "input": "select",  
+                       "options": [  null,  
+                                    "physics", 
+                                    "chemistry", 
+                                    "medicine",  
+                                    "peace", 
+                                    "literature",  
+                                    "economics"  ],  
+                         "labels":[  "Show All", 
+                                     "physics",  
+                                     "chemistry", 
+                                     "medicine", 
+                                     "peace", 
+                                     "literature",   
+                                     "economics"  ],  
+                                     "name": "Category Selection: "  }  } ,             
+   
+{  "name": "Gender_selection",  
+  "bind": {  "input": "select",  
+            "options": [  null,  
+                         "female", 
+                         "male" 
+                          ],  
+              "labels":[  "Show All", 
+                          "female",  
+                          "male" 
+                           ],  
+                          "name": "Gender Selection: "  }  }  ], 
+ "vconcat":[
+   {
+   "width":"container",
+    "transform": [
+  {"filter": "datum.year <= Year"}, 
+  {"filter": "Gender_selection == null || datum.gender == Gender_selection"}
+ ],
+ "encoding": {
+  "x": {"field": "category", "type": "nominal",
+    "axis":{"labelFontSize":12,
+      "labelAngle":45,
+      "labelFontWeight":"bold",
+     
+     "title":null
+      
+    
+    }
+  },
+  "color": {"field": "category", "type": "nominal",
+    "legend":{"orient": "bottom-left","direction": "horizontal",
+              "titleFontWeight":"bolder",
+              "title":null,
+              
+              "symbolSize":150,
+              "labelFontSize":14
+  }, 
+    "scale":{
+    "domain":[
+              "physics", 
+              "chemistry", 
+              "medicine",  
+              "peace", 
+              "literature",  
+              "economics" 
+    ],
+    "range": [  "#e41a1c",  "#984ea3",  "#ff7f00",  "rgba(2, 68, 2, 0.411)",  "#377eb8",  "#a65628"  ] 
+  }},
+  "y": {
+      "field": "age_get_prize",
+      "type": "quantitative",
+      "scale": {"zero": false},
+      "axis":{"labelAngle":40,"labelFontWeight":800,"title":null}
+    }
+ },
+ 
+     "mark": {
+  "type": "boxplot","size": 20 , "extent": "min-max"}
+}  ,
+{
+  "width":"container",
+"transform": [ 
+              {"filter": "datum.year <= Year"}, 
+              {"filter": "Subject_selection == null || datum.category == Subject_selection"},
+              {"filter": "Gender_selection == null || datum.gender == Gender_selection"},
+      {"window": [{"op": "row_number","as": "id1"}],
+                "sort": [{"field": "age_get_prize","order":"descending"}]}
+              
+              ],                                 
+"encoding": {
+       "text":{"field":"fullname"},
+        "color": {"field":"category","type":"nominal"},
+         "y":{"field":"id1","type": "ordinal","title":null,"axis":null},
+         
+        "tooltip":[{"field":"age_get_prize"}, {"field":"category"},
+                    {"field":"gender"}]
+       },   
+       "layer":[  
+                                  
+        {
+           "mark":{"type":"text","fontSize":18,"fontWeight":"bolder"},
+         
+           "transform": [
+           
+            {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "age_get_prize","order":"descending"}]},
+         
+        
+             {"calculate": "'The oldest Winner : ' + datum.firstname + ' ' + datum.surname ","as": "fullname"},
+               {"filter":"datum.rank === 1 "}
+         ]
+                   },
+                   {
+                     "mark":{"type":"text","fontSize":18,"fontWeight":"bolder"},
+         
+                     "transform": [
+                      
+                      {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "age_get_prize","order":"ascending"}]},
+                   
+                  
+                       {"calculate": "'The youngest Winner : ' +  datum.firstname + ' ' + datum.surname","as": "fullname"},
+                         {"filter":"datum.rank === 1 "}
+                   ]
+                   }
+                   
+                   ]
+  
+    
+               }
+                    
+]    
+ 
+}

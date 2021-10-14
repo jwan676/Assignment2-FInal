@@ -1,0 +1,82 @@
+font {
+  font-family: "Source Sans Pro", sans-serif;
+}
+h1 {
+  font-weight: 900;
+  font-size: 48px;
+  background-color:white;
+  text-align: center;
+}
+h2 {
+  font-weight: 900;
+  font-size: 24px;
+  background-color:white;
+  text-align: center;
+}
+
+body {
+  background-color:  white;
+}
+.page {
+  width: 850;
+  background-color: white;
+  margin: 20px;
+  padding: 50px;
+  padding-top: 35px;
+  font-size: 24px;
+}
+.vis-container {
+  width: 110%;
+  font-size: 14px;
+  line-height: 20px;
+  margin-top: 0px;
+  text-align: left;
+  margin-left: 0%;
+  background-color: white;
+}
+.description h3, h2,
+h1 {
+  margin-top: 20px;
+}
+.description-right {
+  margin-top: 50px;
+  margin-right: 10%;
+  padding-left: 0px;
+}
+.description-left {
+  padding-right: 20px;
+}
+.pure-g {
+  margin-bottom: 10px;
+  margin-left: 0%;
+}
+.small-font {
+  font-size: 16px;
+}
+.vega-bindings {
+  
+  margin-top: 0px;
+  margin: 0px;
+  
+  width:300px;
+ 
+
+  
+}
+.vega-bind {
+  font-size: 14px;
+  margin-top: 0px;
+  margin: 0px;
+  margin-left: 20px;
+  width:fit-content;
+  line-height: 25px;
+  font-weight: bolder;
+  background-color: white;
+}
+.marks {
+  padding: 0;
+  margin-bottom: 0%;
+
+ 
+  
+}

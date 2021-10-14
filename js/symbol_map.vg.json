@@ -1,0 +1,319 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+ 
+  "data": {"url": "./data/nobel_final.csv"}, "background":"skyblue",
+  "config": {"style": {"cell":{"stroke":"transparent"}}},
+  "params": [  {  "name": "Year", 
+                  "value": 2019,  
+                  "bind": {  "input": "range", 
+                             "min": 1901,  "max": 2019,  "step": 1,  
+                             "name": "Year: " }  }, 
+                   
+               {  "name": "Subject_selection",  
+                  "bind": {  "input": "select",  
+                            "options": [  null,  
+                                         "physics", 
+                                         "chemistry", 
+                                         "medicine",  
+                                         "peace", 
+                                         "literature",  
+                                         "economics"  ],  
+                              "labels":[  "Show All", 
+                                          "physics",  
+                                          "chemistry", 
+                                          "medicine", 
+                                          "peace", 
+                                          "literature",   
+                                          "economics"  ],  
+                                          "name": "Category Selection: "  }  }  ], 
+  "transform": [
+    {"filter": "datum.year <= Year"}, 
+     {"filter": "Subject_selection == null || datum.category == Subject_selection"}
+  ],
+   "spacing": 10,
+  "vconcat": [
+    { 
+      
+      "transform": [
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "field": "country",
+              "as": "totalwinnerByCountry"
+            }
+          ],
+          "groupby": ["country"]
+        },
+     
+        {
+  "lookup": "country",
+  "from": {
+    "data": {"url": "./data/countries_centriod.csv"},
+    "key": "Short",
+    "fields": ["Central_lat", "Central_lng", "Country"]
+  }}
+      ],
+      
+      "width": "container",
+      "height": 600,
+      "layer": [
+        {
+         
+          "data": {
+            "url": "./js/ne_110m_admin_0_countries.topojson",
+            "format": {
+              "type": "topojson",
+              "feature": "ne_110m_admin_0_countries"
+            }
+          },
+         "projection": {"type":  "equalEarth"}, 
+          "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"}
+      
+        
+        },
+        {
+          "mark": {"type": "circle","color":"blue"},
+         
+          "transform": [
+          
+      {"filter": {"param": "select"}}
+          ],
+          "encoding": {
+            "latitude": {"field": "Central_lat", "type": "quantitative"},
+            "longitude": {"field": "Central_lng", "type": "quantitative"},
+          
+            "fillOpacity": {
+        
+              "value":1
+            },
+            "size": {
+              "field": "totalwinnerByCountry",
+              "type": "quantitative",
+              
+              "scale": {  "type": "threshold", 
+              
+                          "domain": [8, 20, 80, 150,300], 
+                          "range": [50, 70, 120, 160, 270, 320]  }, 
+                           "legend": {
+                             "format": ".1s","title":"Number of Winner",
+                             
+                             "orient": "top-left",
+                             "direction": "vertical",
+                              "titleFontSize":16,"titleFontWeight":"bolder", "symbolSize":15,"labelFontSize":15
+                            } 
+                         
+            }
+            
+          }
+        },
+        {
+          "transform": [
+              {"window": [{"op":"rank","as": "ranking"}],
+              "sort": [{"field": "totalwinnerByCountry","order":"descending"}]},
+              {"filter": "datum.ranking == 1"}, 
+              {"calculate": "'The country which rewards the most Nobel Prize times is '","as": "text1" },
+              {"calculate": " datum.Country ","as": "text2" },
+              {"calculate": " '.The total number of Prize is'","as": "text3" },
+              {"calculate": " datum.totalwinnerByCountry","as": "text4" }
+            ],
+       
+            "layer":[
+              { 
+                "mark": {  "type": "text", 
+                     "align": "center",  
+                      "baseline": "middle",  
+                      "dx": -263,
+                      "dy": 280,  
+                      "fontSize": 18, 
+                      "fontWeight":700 },
+                      "encoding": {
+                        "text": {"field":"text1"} ,
+                        
+                        "color": {"value": " rgba(11, 56, 139, 0.651)"}
+                      }
+                    },
+                      {
+                        "mark": {  "type": "text", 
+                      "align": "center",  
+                       "baseline": "middle",  
+                       "dx": 68,
+                       "dy": 280,  
+                       "fontSize": 20,  
+                       "fontWeight":"bolder" },
+                       "encoding": {
+                        "text": {"field": "text2"} ,
+                        
+                        "color": {"value":" red"}
+                      }
+                      },
+                      {
+                        "mark": {  "type": "text", 
+                      "align": "center",  
+                       "baseline": "middle",  
+                       "dx":263,
+                       "dy": 280,  
+                       "fontWeight":700 ,
+                       "fontSize": 18
+                      },
+                       "encoding": {
+                        "text": {"field": "text3"} ,
+                        
+                        "color": {"value": " rgba(11, 56, 139, 0.651)"}
+                      }
+                      },
+                      {
+                        "mark": {  "type": "text", 
+                      "align": "center",  
+                       "baseline": "middle",  
+                       "dx": 418,
+                       "dy": 280,  
+                       "fontSize": 20,  
+                       "fontWeight":"bolder"
+                        },
+                       "encoding": {
+                        "text": {"field": "text4"} ,
+                        
+                        "color": {"value": "red"}
+                      }
+                      }
+                    ]
+           
+          
+        },
+        { "params": [
+            {
+              "name":"click",
+              "select": {"type": "point","on":"mousedown","nearest": true}
+            }
+          ],
+
+          "transform": [
+      {"filter": {"param": "select"}}
+          ],
+          "mark": {  "type": "text", 
+                     "align": "right",  
+                      "baseline": "middle",  
+                      "dx": -15,  
+                      "fontSize": 11.5,  
+                      "fontStyle": "italic"  }, 
+          "encoding": {
+            "text":{"field":"Country","type": "nominal"},
+            "latitude": {"field": "Central_lat", "type": "quantitative"},
+            "longitude": {"field": "Central_lng", "type": "quantitative"},
+            "color": {"value": "black"},
+            "tooltip": [
+              {"field": "Country", "type": "nominal"},
+              {"field": "totalwinnerByCountry", "type": "quantitative","title":"Total Winner By Country"}
+            ],
+           "opacity":{
+            "condition": {
+              "test": {"or": [
+                {"param": "select", "empty": false},
+                {"param": "click", "empty": false}
+              ]},
+              "value": 1
+            },"value":0
+           }
+          }
+        }
+      ]
+    },
+    {
+      
+      "width": "container",
+      "height": 200,
+       
+    
+      "transform": [
+       
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "field": "country",
+              "as": "totalwinnerByCategory"
+            }
+          ],
+          "groupby": ["country","category"]
+        },
+        
+        {
+      "lookup": "country",
+      "from": {
+        "data": {"url": "./data/countries_centriod.csv"},
+        "key": "Short",
+        "fields": ["Country"]
+      }}
+      
+      
+      ],
+      "encoding": {
+        "x": {"field": "Country",
+               "type": "nominal" ,
+               "title":null,
+               "axis":{"labelFontSize":12,
+                      "labelAngle":45,
+                      "labelFontWeight":"bold",
+                      "labelBaseline":"line-top",
+                      "labelPadding":-50,
+                      "offset":80,
+                      "domainColor":"skyblue",
+                      "tickColor":"skyblue"
+                    }
+              },
+        "y": {
+          
+         "field":"totalwinnerByCategory","type": "quantitative",
+          "title":null,
+          
+          "scale":{"type": "symlog","domain":[1,400]},
+          "axis":null
+        },
+        "color": {"field": "category",
+                  "type": "nominal",
+                  "legend":{ "orient": "top-right","symbolSize":150,"titleFontSize":16,"titleFontWeight":"bolder",
+                  "direction": "vertical","title":"Category","labelFontSize":15},
+                  "scale":{
+                    "domain":[
+                              "physics", 
+                              "chemistry", 
+                              "medicine",  
+                              "peace", 
+                              "literature",  
+                              "economics" 
+                    ],
+                    "range": [  "#e41a1c",  "#984ea3",  "#ff7f00",  " rgba(2, 68, 2, 0.411)",  "#377eb8",  "#a65628"  ] 
+                  }
+        },
+      "fillOpacity": {
+          "condition": {"param": "select", "value": 1},
+          "value": 0.1
+        },
+    
+
+        "tooltip": [
+          {"field": "Country", "type": "nominal"},
+          {"field": "category", "type": "nominal"},
+          {
+            "field": "totalwinnerByCategory",
+            "type": "quantitative",
+            "title": "Winner number "
+          }
+        ]
+      },
+      "layer":[
+        {
+          "params": [
+            {
+              "name":"select",
+              "select": {"type": "interval","encodings": ["x"]}
+            }
+          ],
+          "mark":"bar"
+        }
+     
+      ]
+    }
+  ]
+}

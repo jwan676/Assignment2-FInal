@@ -1,0 +1,49 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {"url": "./data/nobel_final.csv"},
+   
+    "padding":40,
+   "width":"container",
+   "height":300,
+     "layer":[{ 
+
+    "transform": [
+     
+     
+      {"aggregate": [{"op": "count","as": "countprize"}],"groupby": ["firstname","born_country_code","surname"]},
+
+      {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "countprize","order":"descending"}]}
+      , {"calculate": "datum.firstname + ' ' + datum.surname + 'win'+ ' ' + datum.countprize +' the most times Nobel Prize '","as": "fullname"},
+ 
+      {"filter":"datum.rank === 1"}
+    ],
+     "encoding": {
+     "y": {"value":10},
+    "x":{"value":0},
+       "text":{"field":"fullname"}
+     },
+      "mark":"text"
+    },
+    {
+      "mark":"text",
+    
+      "transform": [
+       {"window": [{"op": "row_number","as": "id1"}],"sort": [{"field": "age_get_prize","order":"descending"}],"groupby": ["category"]},
+    
+    
+        {"calculate": "datum.age_get_prize+ datum.firstname","as": "oldest1"},
+          {"filter":"datum.id1< 7"}
+    ],
+    "encoding": {
+                "text":{"field":"oldest1"},
+                 "y":{"field":"id1"},
+                 "x":{"field":"category","type": "nominal"}
+                }
+    }
+  
+  
+  
+  ]
+   
+           
+}

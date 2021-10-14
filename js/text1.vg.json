@@ -1,0 +1,90 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {"url": "./data/nobel_final.csv"},
+   
+    "padding":40,
+   "width":"container",
+   "params": [  {  "name": "Year", 
+                  "value": 2019,  
+                  "bind": {  "input": "range", 
+                             "min": 1901,  "max": 2019,  "step": 1,  
+                             "name": "Year: " }  }, 
+                   
+               {  "name": "Subject_selection",  
+                  "bind": {  "input": "select",  
+                            "options": [  null,  
+                                         "physics", 
+                                         "chemistry", 
+                                         "medicine",  
+                                         "peace", 
+                                         "literature",  
+                                         "economics"  ],  
+                              "labels":[  "Show All", 
+                                          "physics",  
+                                          "chemistry", 
+                                          "medicine", 
+                                          "peace", 
+                                          "literature",   
+                                          "economics"  ],  
+                                          "name": "Category Selection: "  }  }  ], 
+
+         "transform": [  {"window": [{"op": "row_number","as": "id1"}],"sort": [{"field": "age_get_prize","order":"descending"}]}],                                 
+         "encoding": {
+                "text":{"field":"fullname"},
+                "x": {"axis":null,"value":0},
+                  "y":{"field":"id1","type": "ordinal","title":null,"axis":null},
+                 "tooltip":[{"field":"age_get_prize"},
+                             {"field":"gender"}]
+                },                              
+    "layer":[  
+      { 
+
+        "transform": [
+          {"aggregate": [{"op": "count","as": "countprize"}],"groupby": ["firstname","born_country_code","surname"]},
+    
+          {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "countprize","order":"descending"}]}
+          , {"calculate": "' the most times Winer: '+ datum.firstname + ' ' + datum.surname + 'win'+ ' ' + datum.countprize ","as": "fullname"},
+     
+          {"filter":"datum.rank === 1"}
+        ],
+        "encoding": {
+          "tooltip":[{"field":"age_get_prize"},
+          {"field":"gender"}]
+        },
+        "mark":{"type":"text","fontSize":14}
+        },                                    
+   {
+      "mark":{"type":"text","fontSize":14},
+    
+      "transform": [
+        {"filter": "datum.year <= Year"}, 
+        {"filter": "Subject_selection == null || datum.category == Subject_selection"},
+       {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "age_get_prize","order":"descending"}]},
+    
+   
+        {"calculate": "'The oldest Winner : ' + datum.firstname + ' ' + datum.surname ","as": "fullname"},
+          {"filter":"datum.rank === 1 "}
+    ]
+              },
+              {
+                "mark":{"type":"text","fontSize":14},
+    
+                "transform": [
+                  {"filter": "datum.year <= Year"}, 
+                  {"filter": "Subject_selection == null || datum.category == Subject_selection"},
+                 {"window": [{"op":"rank","as": "rank"}],"sort": [{"field": "age_get_prize","order":"ascending"}]},
+              
+             
+                  {"calculate": "'The youngest Winner : ' +  datum.firstname + ' ' + datum.surname","as": "fullname"},
+                    {"filter":"datum.rank === 1 "}
+              ]
+              }
+              
+              ]
+    }
+  
+  
+  
+ 
+   
+           
